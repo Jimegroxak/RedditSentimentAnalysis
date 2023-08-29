@@ -8,6 +8,7 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import stopwords
 import re, string
 
 def GetHotPosts():
@@ -27,7 +28,7 @@ def GetHotPosts():
     TOKEN = res.json()['access_token']
     headers['Authorization'] = f'bearer {TOKEN}'
 
-    res = requests.get('https://oauth.reddit.com/r/learnprogramming/top/?t=month&limit=1', headers=headers)
+    res = requests.get('https://oauth.reddit.com/r/learnprogramming/top/?t=month&limit=2', headers=headers)
 
     i = 0
     posts = []
@@ -37,9 +38,11 @@ def GetHotPosts():
         text = (post['data']['selftext'])
         posts.append(str(title + text))
 
+    stopWords = stopwords.words('english')
     tokens = Tokenize(posts)
     normPosts = Normalize(tokens)
-    cleanPosts = RemoveNoise(normPosts)
+    cleanPosts = RemoveNoise(normPosts, stopWords)
+    print(cleanPosts)
 
 
 def Tokenize(posts):
@@ -74,8 +77,8 @@ def RemoveNoise(normPosts, stopWords = ()):
             token = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|'\
                        '(?:%[0-9a-fA-F][0-9a-fA-F]))+','', token)
             token = re.sub("(@[A-Za-z0-9_]+)","", token)
-        if len(token) > 0 and token not in string.punctuation and token.lower() not in stopWords:
-            cleanPost.append(token.lower())
+            if len(token) > 0 and token not in string.punctuation and token.lower() not in stopWords:
+                cleanPost.append(token.lower())
         cleanedPosts.append(cleanPost)
     
     return cleanedPosts
