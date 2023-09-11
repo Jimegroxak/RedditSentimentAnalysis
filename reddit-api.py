@@ -9,6 +9,7 @@ from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
+from nltk import FreqDist
 import re, string
 
 def GetHotPosts():
@@ -28,7 +29,7 @@ def GetHotPosts():
     TOKEN = res.json()['access_token']
     headers['Authorization'] = f'bearer {TOKEN}'
 
-    res = requests.get('https://oauth.reddit.com/r/learnprogramming/top/?t=month&limit=2', headers=headers)
+    res = requests.get('https://oauth.reddit.com/r/cscareers/top/?t=month&limit=5', headers=headers)
 
     i = 0
     posts = []
@@ -39,10 +40,15 @@ def GetHotPosts():
         posts.append(str(title + text))
 
     stopWords = stopwords.words('english')
+    stopWords.append("n't")
+    stopWords.append("’")
     tokens = Tokenize(posts)
     normPosts = Normalize(tokens)
     cleanPosts = RemoveNoise(normPosts, stopWords)
-    print(cleanPosts)
+    
+    allWords = GetAllWords(cleanPosts)
+    freqDist = FreqDist(allWords)
+    print(freqDist.most_common(10))
 
 
 def Tokenize(posts):
@@ -83,7 +89,10 @@ def RemoveNoise(normPosts, stopWords = ()):
     
     return cleanedPosts
 
-
+def GetAllWords(cleanPosts):
+    for tokens in cleanPosts:
+        for token in tokens:
+            yield token
 
 if __name__ == "__main__":
     GetHotPosts()
