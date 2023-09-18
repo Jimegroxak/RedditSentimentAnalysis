@@ -31,12 +31,14 @@ def GetHotPosts():
     TOKEN = res.json()['access_token']
     headers['Authorization'] = f'bearer {TOKEN}'
 
-    res = requests.get('https://oauth.reddit.com/r/gaming/top/?t=month&limit=25', headers=headers)
+    subreddit = input("Enter desired subreddit: r/")
+    url = 'https://oauth.reddit.com/r/' + subreddit + '/top/?t=month'
 
-    i = 0
+    res = requests.get(url, headers=headers)
+    print(res.json()['data']['after'])
+
     posts = []
     for post in res.json()['data']['children']:
-        i += 1
         title = (post['data']['title'])
         text = (post['data']['selftext'])
         posts.append(str(title + text))
@@ -51,13 +53,18 @@ def GetHotPosts():
 
     f = open('classifier.pickle', 'rb')
     classifier = pickle.load(f)
-    #f.close()
+    f.close()
 
-    i = 0
+    pos, neg = 0, 0
+
     for post in cleanPosts:
-        print(posts[i])
-        print(classifier.classify(dict([token, True] for token in post)))
-        i += 1
+        res = classifier.classify(dict([token, True] for token in post))
+        if res == 'Positive':
+            pos += 1
+        else:
+            neg += 1
+
+    print("positive/negative ratio: " + str(pos) + '/' + str(neg))
 
 if __name__ == "__main__":
     GetHotPosts()

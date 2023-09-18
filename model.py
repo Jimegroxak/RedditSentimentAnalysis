@@ -78,9 +78,9 @@ print("Accuracy is:", classify.accuracy(classifier, testData))
 
 print(classifier.show_most_informative_features(10))
 
-f = open('classifier.pickle', 'wb')
-pickle.dump(classifier, f)
-f.close()
+#f = open('classifier.pickle', 'wb')
+#pickle.dump(classifier, f)
+#f.close()
 
 
 
