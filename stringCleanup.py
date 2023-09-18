@@ -19,8 +19,8 @@ def Tokenize(posts):
 def Normalize(tokens):
     lemmatizer = WordNetLemmatizer()
     lemmatized_sentences = []
-    lemmatized_sentence = []
     for token in tokens:
+        lemmatized_sentence = []
         for word, tag in pos_tag(token):
             if tag.startswith('NN'):
                 pos = 'n'
@@ -34,10 +34,8 @@ def Normalize(tokens):
 
 def RemoveNoise(normPosts, stopWords = ()):
     cleanedPosts = []
-    i = 0
 
     for post in normPosts:
-        print("post " + str(i))
         cleanPost = []
         for token in post:
             token = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|'\
@@ -46,7 +44,6 @@ def RemoveNoise(normPosts, stopWords = ()):
             if len(token) > 0 and token not in string.punctuation and token.lower() not in stopWords:
                 cleanPost.append(token.lower())
         cleanedPosts.append(cleanPost)
-        i += 1
     
     return cleanedPosts
 
@@ -56,11 +53,8 @@ def GetAllWords(cleanPosts):
             yield token
 
 def TheWholeShebang(strings, stopWords=()):
-    print("Initiating the whole shebang")
     tokens = Tokenize(strings)
-    print("Tokenized")
     lemSent = Normalize(tokens)
-    print("Normalized")
     cleanStrings = RemoveNoise(lemSent, stopWords)
     return cleanStrings
 

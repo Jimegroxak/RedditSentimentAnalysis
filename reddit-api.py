@@ -12,6 +12,7 @@ from nltk.corpus import stopwords
 from nltk import FreqDist
 import re, string
 from stringCleanup import *
+import pickle
 
 def GetHotPosts():
     auth = requests.auth.HTTPBasicAuth(CLIENT_ID, SECRET_KEY)
@@ -30,7 +31,7 @@ def GetHotPosts():
     TOKEN = res.json()['access_token']
     headers['Authorization'] = f'bearer {TOKEN}'
 
-    res = requests.get('https://oauth.reddit.com/r/cscareers/top/?t=month&limit=25', headers=headers)
+    res = requests.get('https://oauth.reddit.com/r/gaming/top/?t=month&limit=25', headers=headers)
 
     i = 0
     posts = []
@@ -43,11 +44,20 @@ def GetHotPosts():
     stopWords = stopwords.words('english')
     stopWords.append("n't")
     stopWords.append("’")
+
+
     cleanPosts = TheWholeShebang(posts, stopWords)
-    
-    allWords = GetAllWords(cleanPosts)
-    freqDist = FreqDist(allWords)
-    print(freqDist.most_common(10))
+    #import classifier and classify the posts
+
+    f = open('classifier.pickle', 'rb')
+    classifier = pickle.load(f)
+    #f.close()
+
+    i = 0
+    for post in cleanPosts:
+        print(posts[i])
+        print(classifier.classify(dict([token, True] for token in post)))
+        i += 1
 
 if __name__ == "__main__":
     GetHotPosts()
