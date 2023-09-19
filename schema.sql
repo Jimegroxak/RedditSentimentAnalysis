@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS subreddits;
+
+CREATE TABLE subreddits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    sentiment BIT NOT NULL
+);
